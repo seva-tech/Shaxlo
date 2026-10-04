@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>тебе письмо</title>
+<link href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0a3a;--ink:#fff4dc;--gold:#ffd86b;--lilac:#b69cf0;--paper:#f6ead8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0a3a}}
+:root[data-theme="dark"]{--bg:#0d0a3a}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);overflow:hidden;font-family:'Cormorant Garamond',Georgia,serif}
+canvas#sky{position:fixed;inset:0;width:100%;height:100%}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;opacity:0;pointer-events:none;transition:opacity 1.2s ease}
+.scr.on{opacity:1;pointer-events:auto}
+h1{font-size:30px;font-weight:600;margin:0 0 14px;line-height:1.2}
+.hand{font-family:'Marck Script','Segoe Script',cursive}
+.hint{font-size:24px;color:var(--lilac);margin:0 0 28px}
+input{width:min(80vw,320px);padding:16px;border-radius:999px;border:1.5px solid #6f66b8;background:rgba(60,50,130,.55);color:var(--ink);font:600 20px 'Cormorant Garamond',serif;text-align:center;outline:none}
+input:focus{border-color:var(--gold)}
+button.go{margin-top:14px;width:min(80vw,320px);padding:16px;border:0;border-radius:999px;background:var(--gold);color:#6a4a10;font:600 19px 'Cormorant Garamond',serif;box-shadow:0 0 28px rgba(255,216,107,.45);cursor:pointer}
+.err{height:22px;margin-top:12px;color:#ff9fb8;font-size:18px}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.big{font-size:34px;font-weight:600}
+.small{font-size:30px;color:var(--lilac);margin-bottom:6px}
+.env{position:relative;width:min(76vw,300px);aspect-ratio:3/2;cursor:pointer;filter:drop-shadow(0 10px 30px rgba(150,120,255,.35));animation:fl 4s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-8px)}}
+.env .body{position:absolute;inset:0;background:var(--paper);border-radius:8px}
+.env .body:before{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 49.5%,#e4d3bb 50%) 0 0/50% 100% no-repeat,linear-gradient(to top left,transparent 49.5%,#e4d3bb 50%) 100% 0/50% 100% no-repeat;border-radius:8px;opacity:.8}
+.flap{position:absolute;left:0;right:0;top:0;height:58%;background:#ecdcc4;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .9s ease}
+.seal{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px;border-radius:50%;background:#a98be0;box-shadow:inset 0 0 0 4px #bba0ee;display:grid;place-items:center;font:28px 'Marck Script',cursive;color:#7a5fc0;transition:opacity .5s}
+.to{position:absolute;left:0;right:0;bottom:12%;font-size:22px;color:#5a5170}
+.sheet{position:absolute;left:7%;right:7%;top:10%;bottom:10%;background:#fffaf0;border-radius:4px;transition:transform 1.1s ease .5s}
+.env.open .sheet{transform:translateY(-62%)}
+.env.open .flap{transform:rotateX(180deg)}
+#paper{justify-content:flex-start;overflow-y:auto;padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(36px + env(safe-area-inset-bottom,0px))}
+.card{margin:auto 0;width:min(100%,440px);background:var(--paper);color:#4a3f5c;border-radius:14px;padding:30px 24px 26px;text-align:left;box-shadow:0 0 50px rgba(160,130,255,.35);font-family:'Marck Script','Segoe Script',cursive;font-size:21px;line-height:1.55}
+.card p{margin:0 0 18px;opacity:0;transform:translateY(10px);transition:opacity 1.3s ease,transform 1.3s ease}
+.card p.show{opacity:1;transform:none}
+.card .next{display:block;margin:6px auto 0;padding:12px 28px;border:0;border-radius:999px;background:#a98be0;color:#fff;font:22px 'Marck Script',cursive;cursor:pointer;opacity:0;transition:opacity 1.3s}
+.card .next.show{opacity:1}
+.env.open .seal{opacity:0}
+.tap{margin-top:34px;font-size:22px;color:var(--lilac)}
+#letter{justify-content:center;gap:0}
+#letter p{margin:0 0 20px;opacity:0;font-family:'Marck Script','Segoe Script',cursive;color:var(--ink);text-shadow:0 0 14px rgba(255,216,107,.55);line-height:1.35;transition:opacity 1.6s ease}
+#letter p.show{opacity:1}
+.l0{font-size:36px}.l1,.l2{font-size:30px}.l3{font-size:26px;color:#f3e6ff}.l4{font-size:40px}
+.again{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom,0px));left:0;right:0;font:22px 'Marck Script',cursive;color:#a98be0;background:none;border:0;opacity:0;transition:opacity 2s;cursor:pointer}
+.again.show{opacity:1}
+.mus{position:absolute;top:calc(18px + env(safe-area-inset-top,0px));right:18px;width:46px;height:46px;border-radius:50%;border:1px solid #777;background:rgba(0,0,0,.35);color:var(--ink);font-size:20px;cursor:pointer}
+.heart{position:fixed;bottom:-40px;pointer-events:none;animation:up linear forwards;z-index:5}
+@keyframes up{to{transform:translateY(-115vh) rotate(25deg)}}
+@media (prefers-reduced-motion:reduce){.env,.heart{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+
+<section class="scr on" id="gate">
+  <h1>Эта эмоция закрыта словом</h1>
+  <p class="hint hand" id="hint"></p>
+  <input id="pw" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Слово">
+  <button class="go" id="open">Открыть</button>
+  <div class="err" id="err"></div>
+</section>
+
+<section class="scr" id="intro">
+  <div class="small hand" id="who1"></div>
+  <div class="big">тебе письмо</div>
+</section>
+
+<section class="scr" id="env">
+  <div class="env" id="envelope"><div class="body"></div><div class="sheet"></div><div class="flap"></div><div class="seal" id="seal"></div><div class="to hand" id="to"></div></div>
+  <div class="tap hand">открой это</div>
+</section>
+
+<section class="scr" id="paper">
+  <div class="card" id="card"></div>
+</section>
+
+<section class="scr" id="letter">
+  <button class="mus" id="mus" aria-label="Музыка">♪</button>
+  <div id="lines"></div>
+  <button class="again" id="again">прочитать сначала</button>
+</section>
+
+<script>
+/* ===== НАСТРОЙКИ: меняй здесь ===== */
+const NAME   = "Шахло";
+const HINT   = "кого я люблю больше всего";
+const ANSWERS= ["шахло","тебя","ты","шахлo"];            // правильные слова (строчными)
+const LINES  = [
+  [NAME+",", "l0"],
+  ["с тобой мне спокойно.", "l1"],
+  ["Ты мой родной человек.", "l2"],
+  ["Я очень-очень тебя люблю", "l3"],
+  ["счастье — это ты ✨", "l4"]
+];
+/* ================================== */
+const $=id=>document.getElementById(id);
+$('hint').textContent=HINT; $('who1').textContent=NAME+",";
+$('to').textContent=NAME; $('seal').textContent=NAME[0];
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id===id))}
+
+/* звёздное небо */
+const cv=$('sky'),cx=cv.getContext('2d');let W,H,stars=[],cons=[],showCons=false,consA=0;
+function resize(){const d=devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
+  stars=Array.from({length:110},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.3,p:Math.random()*6}));
+  cons=[];for(let k=0;k<5;k++){const bx=Math.random()*W,by=Math.random()*H,pts=[];
+    for(let i=0;i<5;i++)pts.push([bx+(Math.random()-.5)*160,by+(Math.random()-.5)*160]);cons.push(pts)}}
+addEventListener('resize',resize);resize();
+(function draw(t){cx.clearRect(0,0,W,H);
+  const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0d0a3a');g.addColorStop(1,showCons?'#3a2266':'#1a1458');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  for(const s of stars){cx.globalAlpha=.4+.6*Math.abs(Math.sin(t/1200+s.p));cx.fillStyle='#fff';cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill()}
+  consA+=((showCons?1:0)-consA)*.02;cx.globalAlpha=.28*consA;cx.strokeStyle='#cfc6ff';cx.lineWidth=1;
+  for(const c of cons){cx.beginPath();c.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.stroke();
+    cx.globalAlpha=.7*consA;c.forEach(p=>{cx.beginPath();cx.arc(p[0],p[1],2,0,7);cx.fillStyle='#fff';cx.fill()});cx.globalAlpha=.28*consA}
+  cx.globalAlpha=1;requestAnimationFrame(draw)})(0);
+
+/* пароль */
+function check(){const v=$('pw').value.trim().toLowerCase().replace(/ё/g,'е');
+  if(ANSWERS.some(a=>a.replace(/ё/g,'е')===v)){$('err').textContent='';startAudio();go('intro');setTimeout(()=>go('env'),2800)}
+  else{$('err').textContent='не то слово, попробуй ещё';$('pw').classList.remove('shake');void $('pw').offsetWidth;$('pw').classList.add('shake')}}
+$('open').onclick=check;$('pw').onkeydown=e=>{if(e.key==='Enter')check()};
+
+/* конверт */
+const TEXT=[
+"Иногда мне так хочется просто быть рядом с тобой. Без громких слов, без каких-то особенных причин. Просто знать, что ты есть, слышать твой голос, смеяться с тобой и чувствовать то самое спокойствие, которое бывает только рядом с близким человеком.",
+"Я не всегда умею правильно говорить о своих чувствах. Иногда могу молчать, что-то держать в себе или делать вид, что мне всё равно. Но на самом деле мне далеко не всё равно. Мне важно твоё отношение, твои слова, твоё присутствие.",
+"Мне хочется, чтобы между нами всегда оставалось что-то настоящее — то, что не зависит от времени, расстояния или каких-то мелочей. Чтобы даже после ссор и сложных дней мы всё равно могли найти дорогу друг к другу.",
+"Спасибо тебе за все моменты, за тепло, за смех и даже за те моменты, которые научили меня ценить близких ещё сильнее.",
+"Просто знай: ты занимаешь особенное место в моём сердце. И я очень надеюсь, что оно всегда будет наполнено чем-то добрым, тёплым и настоящим."];
+function readPaper(){const c=$('card');c.innerHTML='';c.parentElement.scrollTop=0;
+  const ps=TEXT.map(t=>{const p=document.createElement('p');p.textContent=t;c.appendChild(p);return p});
+  const b=document.createElement('button');b.className='next';b.textContent='дальше';b.onclick=()=>{go('letter');readLetter()};c.appendChild(b);
+  [...ps,b].forEach((el,i)=>setTimeout(()=>el.classList.add('show'),600+i*1400))}
+$('envelope').onclick=()=>{if($('envelope').classList.contains('open'))return;$('envelope').classList.add('open');
+  setTimeout(()=>{go('paper');readPaper()},2000)};
+
+/* письмо */
+let timers=[],heartT;
+function readLetter(){timers.forEach(clearTimeout);clearInterval(heartT);showCons=true;
+  const box=$('lines');box.innerHTML='';$('again').classList.remove('show');
+  LINES.forEach(([t,c],i)=>{const p=document.createElement('p');p.className=c;p.textContent=t;box.appendChild(p);
+    timers.push(setTimeout(()=>p.classList.add('show'),900+i*1700))});
+  timers.push(setTimeout(()=>$('again').classList.add('show'),900+LINES.length*1700+1200));
+  heartT=setInterval(spawn,700)}
+function spawn(){const h=document.createElement('div');h.className='heart';
+  h.textContent=['💜','💗','🤍','💛','💜'][Math.random()*5|0];h.style.left=Math.random()*95+'vw';
+  h.style.fontSize=(18+Math.random()*26)+'px';h.style.opacity=.5+Math.random()*.5;h.style.animationDuration=(7+Math.random()*6)+'s';
+  document.body.appendChild(h);setTimeout(()=>h.remove(),14000)}
+$('again').onclick=readLetter;
+
+/* музыка (мягкие ноты) */
+let ac,playing=false,mt;
+function startAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();playing=true;
+  const n=[261.6,329.6,392,523.3,392,329.6,293.7,349.2,440,587.3,440,349.2];let i=0;clearInterval(mt);
+  mt=setInterval(()=>{if(!playing)return;const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=n[i++%n.length];
+    g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(.06,ac.currentTime+.05);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+1.8);
+    o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+1.9)},700)}catch(e){}}
+$('mus').onclick=()=>{playing=!playing;$('mus').style.opacity=playing?1:.4;if(playing&&!ac)startAudio()};
+</script>
+</body>
+</html>
